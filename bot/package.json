@@ -1,0 +1,22 @@
+{
+  "name": "licensing-discord-bot",
+  "version": "1.0.0",
+  "description": "Discord bot for Minecraft plugin licensing management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": ["discord", "bot", "minecraft", "licensing"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "mongoose": "^8.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: licensing-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: licensing_saas
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - licensing-network
+
+  # Backend API
+  backend:
+    build: ./backend
+    container_name: licensing-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/licensing_saas?authSource=admin
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_EXPIRE: 7d
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongodb
+    networks:
+      - licensing-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    container_name: licensing-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - licensing-network
+
+  # Discord Bot
+  bot:
+    build: ./bot
+    container_name: licensing-bot
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_URL: http://backend:4000/api
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+      DISCORD_CHANNEL_ID: ${DISCORD_CHANNEL_ID}
+      ADMIN_ROLE_IDS: ${ADMIN_ROLE_IDS}
+    depends_on:
+      - backend
+    networks:
+      - licensing-network
+    volumes:
+      - ./bot:/app
+      - /app/node_modules
+
+volumes:
+  mongodb_data:
+
+networks:
+  licensing-network:
+    driver: bridge
