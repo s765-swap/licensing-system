@@ -19,9 +19,27 @@
         }
       }
     </script>
+    
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body class="bg-gray-50 min-h-screen">
     <div id="root"></div>
+    
+    <!-- Load component scripts -->
+    <script src="src/components/AnalyticsDashboard.js"></script>
+    <script src="src/components/PaymentIntegration.js"></script>
+    
+    <!-- Main application script -->
     <script src="src/main.js"></script>
+    
+    <!-- Initialize Stripe -->
+    <script>
+      window.STRIPE_PUBLISHABLE_KEY = 'pk_test_your_stripe_publishable_key_here';
+      window.API_URL = 'http://localhost:4000/api';
+    </script>
   </body>
 </html>

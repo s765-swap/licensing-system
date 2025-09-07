@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 
 // Import simple database
 const db = require('./config/database-simple');
+const User = require('./models/User');
 
 // Create default admin account on startup
 const createDefaultAdmin = async () => {
@@ -60,6 +61,32 @@ app.use(cors({
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Subdomain extraction middleware
+app.use(async (req, res, next) => {
+  // Only apply to requests for the store (public store)
+  const host = req.headers.host;
+  // Example: s765.license.com or localhost:4000
+  let subdomain = null;
+  if (host && !host.startsWith('localhost')) {
+    const parts = host.split('.');
+    if (parts.length > 2) {
+      subdomain = parts[0];
+    }
+  }
+  if (subdomain) {
+    // Find user by subdomain
+    try {
+      const user = await User.findOne({ storeSubdomain: subdomain });
+      if (user) {
+        req.storeUser = user;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  next();
+});
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
@@ -632,7 +659,12 @@ app.get('/api/plugins', protect, async (req, res) => {
 // Get all plugins for store (public)
 app.get('/api/store/plugins', async (req, res) => {
   try {
-    const plugins = await db.findPluginsByUser('all'); // Get all plugins
+    let plugins;
+    if (req.storeUser) {
+      plugins = await db.findPluginsByUser(req.storeUser._id);
+    } else {
+      plugins = await db.findPluginsByUser('all'); // fallback: all plugins
+    }
     res.json({
       success: true,
       data: plugins
@@ -646,7 +678,132 @@ app.get('/api/store/plugins', async (req, res) => {
   }
 });
 
-// 404 handler
+// Bot management endpoints - SIMPLIFIED
+console.log('Registering bot routes...');
+
+app.post('/api/bot/start', protect, async (req, res) => {
+  console.log('Bot start endpoint called');
+  try {
+    const { token, channelId, adminRoles } = req.body;
+
+    if (!token || !channelId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bot token and channel ID are required'
+      });
+    }
+
+    // Save bot configuration
+    const botConfig = {
+      token,
+      channelId,
+      adminRoles: adminRoles || [],
+      userId: req.user._id,
+      isActive: true,
+      startedAt: new Date()
+    };
+
+    console.log('Bot configuration saved:', {
+      userId: req.user._id,
+      channelId,
+      adminRoles,
+      startedAt: botConfig.startedAt
+    });
+
+    // Save configuration to a file for the bot launcher to use
+    const fs = require('fs');
+    const path = require('path');
+    const configPath = path.join(__dirname, '..', 'bot-config.json');
+    
+    try {
+      fs.writeFileSync(configPath, JSON.stringify(botConfig, null, 2));
+      console.log('Bot configuration saved to:', configPath);
+    } catch (writeError) {
+      console.error('Failed to write bot config file:', writeError);
+    }
+
+    res.json({
+      success: true,
+      message: 'Bot configuration saved successfully! Go to the Bot Server terminal and run: start-bot.bat',
+      data: {
+        channelId,
+        adminRoles,
+        startedAt: botConfig.startedAt,
+        isRunning: false
+      }
+    });
+  } catch (error) {
+    console.error('Start bot error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error starting bot: ' + error.message
+    });
+  }
+});
+
+app.get('/api/bot/status', protect, async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const configPath = path.join(__dirname, '..', 'bot-config.json');
+    
+    let config = null;
+    try {
+      if (fs.existsSync(configPath)) {
+        const configData = fs.readFileSync(configPath, 'utf8');
+        config = JSON.parse(configData);
+      }
+    } catch (readError) {
+      console.error('Failed to read bot config:', readError);
+    }
+    
+    res.json({
+      success: true,
+      data: {
+        isRunning: false,
+        pid: null,
+        channelId: config ? config.channelId : null,
+        adminRoles: config ? config.adminRoles : [],
+        lastStarted: config ? config.startedAt : null
+      }
+    });
+  } catch (error) {
+    console.error('Get bot status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error getting bot status'
+    });
+  }
+});
+
+// Set or change store subdomain
+app.post('/api/user/store-subdomain', protect, async (req, res) => {
+  try {
+    const { subdomain } = req.body;
+    if (!subdomain || typeof subdomain !== 'string') {
+      return res.status(400).json({ success: false, message: 'Subdomain is required.' });
+    }
+    const clean = subdomain.trim().toLowerCase();
+    if (!/^[a-z0-9-]{3,32}$/.test(clean)) {
+      return res.status(400).json({ success: false, message: 'Subdomain must be 3-32 characters, lowercase letters, numbers, or hyphens.' });
+    }
+    // Check uniqueness (ignore current user)
+    const User = require('./models/User');
+    const taken = await User.findOne({ storeSubdomain: clean, _id: { $ne: req.user._id } });
+    if (taken) {
+      return res.status(409).json({ success: false, message: 'Subdomain is already taken.' });
+    }
+    // Update user
+    req.user.storeSubdomain = clean;
+    await req.user.save();
+    res.json({ success: true, message: 'Store subdomain updated.', data: { storeSubdomain: clean } });
+  } catch (error) {
+    console.error('Set subdomain error:', error);
+    res.status(500).json({ success: false, message: 'Server error setting subdomain.' });
+  }
+});
+
+// 404 handler - must be last
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -671,6 +828,7 @@ app.listen(PORT, async () => {
   console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 API URL: http://localhost:${PORT}/api`);
   console.log(`💾 Database: In-memory (for testing)`);
+  console.log(`🤖 Bot routes registered: /api/bot/start, /api/bot/status, /api/bot/test`);
   
   // Create default admin account
   await createDefaultAdmin();

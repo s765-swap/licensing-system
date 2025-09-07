@@ -51,6 +51,35 @@ const licenseSchema = new mongoose.Schema({
   notes: {
     type: String,
     default: ''
+  },
+  paymentIntentId: {
+    type: String,
+    default: null
+  },
+  amount: {
+    type: Number,
+    default: 0
+  },
+  purchaseDate: {
+    type: Date,
+    default: null
+  },
+  hardwareFingerprint: {
+    type: String,
+    default: null
+  },
+  allowedServers: [{
+    ip: String,
+    port: String,
+    name: String,
+    addedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  maxServers: {
+    type: Number,
+    default: 1
   }
 });
 

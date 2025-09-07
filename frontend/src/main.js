@@ -8,8 +8,9 @@ let state = {
   plugins: [],
   licenses: [],
   storePlugins: [], // Available plugins in store
-  apiUrl: 'http://localhost:4000/api', // Backend API URL
-  token: localStorage.getItem('token') || null
+  apiUrl: window.API_URL || 'http://localhost:4000/api', // Backend API URL
+  token: localStorage.getItem('token') || null,
+  stripePublishableKey: window.STRIPE_PUBLISHABLE_KEY || null
 };
 
 // Authentication functions
@@ -120,9 +121,33 @@ function renderSidebar() {
             </a>
           </li>
           <li>
+            <a href="#" data-nav="store-settings" class="flex items-center px-6 py-3 rounded-lg transition ${state.view === 'store-settings' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100'}">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              Store Settings
+            </a>
+          </li>
+          <li>
+            <a href="#" data-nav="analytics" class="flex items-center px-6 py-3 rounded-lg transition ${state.view === 'analytics' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100'}">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              Analytics
+            </a>
+          </li>
+          <li>
+            <a href="#" data-nav="payments" class="flex items-center px-6 py-3 rounded-lg transition ${state.view === 'payments' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100'}">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              Payments
+            </a>
+          </li>
+          <li>
             <a href="#" data-nav="discord" class="flex items-center px-6 py-3 rounded-lg transition ${state.view === 'discord' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100'}">
               <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
               Discord Bot
+            </a>
+          </li>
+          <li>
+            <a href="#" data-nav="bot-config" class="flex items-center px-6 py-3 rounded-lg transition ${state.view === 'bot-config' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-100'}">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Bot Configuration
             </a>
           </li>
         </ul>
@@ -166,7 +191,9 @@ function getPageTitle() {
     plugins: 'My Plugins',
     licenses: 'License Management',
     store: 'Plugin Store',
-    discord: 'Discord Bot Config'
+    discord: 'Discord Bot Config',
+    'bot-config': 'Bot Configuration',
+    'store-settings': 'Store Settings'
   };
   return titles[state.view] || 'Dashboard';
 }
@@ -313,7 +340,11 @@ function render() {
             ${state.view === 'plugins' ? renderPlugins() : ''}
             ${state.view === 'licenses' ? renderLicenses() : ''}
             ${state.view === 'store' ? renderStore() : ''}
+            ${state.view === 'analytics' ? '<div id="analytics-container"></div>' : ''}
+            ${state.view === 'payments' ? '<div id="payments-container"></div>' : ''}
             ${state.view === 'discord' ? renderDiscordConfig() : ''}
+            ${state.view === 'bot-config' ? (renderBotConfiguration() + '<script>loadBotConfig();</script>') : ''}
+            ${state.view === 'store-settings' ? renderStoreSettings() : ''}
           </main>
         </div>
       </div>
@@ -428,6 +459,13 @@ function setupDashboardEvents() {
       e.preventDefault();
       state.view = el.getAttribute('data-nav');
       render();
+      
+      // Initialize components when switching views
+      if (state.view === 'analytics') {
+        initializeAnalytics();
+      } else if (state.view === 'payments') {
+        initializePayments();
+      }
     };
   });
   
@@ -441,6 +479,31 @@ function setupDashboardEvents() {
     state.view = 'login';
     render();
   };
+}
+
+// Initialize Analytics Dashboard
+async function initializeAnalytics() {
+  if (window.AnalyticsDashboard) {
+    const analytics = new window.AnalyticsDashboard();
+    const container = document.getElementById('analytics-container');
+    if (container) {
+      container.innerHTML = await analytics.render();
+      await analytics.loadData();
+      analytics.bindEvents();
+    }
+  }
+}
+
+// Initialize Payment Integration
+async function initializePayments() {
+  if (window.PaymentIntegration) {
+    const payments = new window.PaymentIntegration();
+    const container = document.getElementById('payments-container');
+    if (container) {
+      container.innerHTML = await payments.render();
+      await payments.init();
+    }
+  }
 }
 
 // Load user data from API
@@ -898,6 +961,142 @@ function renderGlobalModals() {
       </div>
     </div>
 
+    <!-- View License Modal -->
+    <div id="viewLicenseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="bg-white rounded-xl p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">License Details</h3>
+          <button onclick="closeViewLicenseModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        
+        <div class="space-y-6">
+          <!-- License Key -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-semibold text-gray-900 mb-2">License Key</h4>
+            <div class="flex items-center space-x-2">
+              <code id="viewLicenseKey" class="flex-1 bg-gray-900 text-green-400 p-2 rounded text-sm font-mono"></code>
+              <button onclick="copyToClipboard(document.getElementById('viewLicenseKey').textContent)" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded text-xs transition duration-200">
+                Copy
+              </button>
+            </div>
+          </div>
+          
+          <!-- License Information -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white border rounded-lg p-4">
+              <h4 class="font-semibold text-gray-900 mb-3">Basic Information</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Plugin:</span>
+                  <span id="viewLicensePlugin" class="font-medium"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Buyer:</span>
+                  <span id="viewLicenseBuyer" class="font-medium"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Server:</span>
+                  <span id="viewLicenseServer" class="font-medium"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Status:</span>
+                  <span id="viewLicenseStatus" class="px-2 py-1 rounded-full text-xs font-medium"></span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white border rounded-lg p-4">
+              <h4 class="font-semibold text-gray-900 mb-3">Dates</h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Created:</span>
+                  <span id="viewLicenseCreated" class="font-medium"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Expires:</span>
+                  <span id="viewLicenseExpires" class="font-medium"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Allowed Servers -->
+          <div class="bg-white border rounded-lg p-4">
+            <h4 class="font-semibold text-gray-900 mb-3">Allowed Servers</h4>
+            <div id="viewLicenseServers" class="space-y-2">
+              <!-- Servers will be populated here -->
+            </div>
+          </div>
+          
+          <!-- Actions -->
+          <div class="flex space-x-3 pt-4">
+            <button onclick="closeViewLicenseModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-200">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create License Modal -->
+    <div id="createLicenseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+      <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900">Create New License</h3>
+          <button onclick="closeCreateLicenseModal()" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        
+        <form id="createLicenseForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Plugin Name *</label>
+              <input type="text" name="plugin" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MyPlugin" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Buyer Name *</label>
+              <input type="text" name="buyer" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" required>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Server Name *</label>
+              <input type="text" name="server" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MyServer" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Expiration Date</label>
+              <input type="date" name="expiresAt" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <p class="text-xs text-gray-500 mt-1">Leave empty for 1 year from now</p>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 class="font-semibold text-blue-900 mb-2">📋 License Details</h4>
+            <ul class="text-sm text-blue-800 space-y-1">
+              <li>• License key will be generated automatically</li>
+              <li>• License will be active immediately</li>
+              <li>• Server can be configured after creation</li>
+              <li>• License can be revoked at any time</li>
+            </ul>
+          </div>
+          
+          <div class="flex space-x-3 pt-4">
+            <button type="button" onclick="createLicense()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              Create License
+            </button>
+            <button type="button" onclick="closeCreateLicenseModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg transition duration-200">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- Discord Bot Modal -->
     <div id="discordBotModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
       <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -1078,28 +1277,177 @@ function renderDiscordConfig() {
   `;
 }
 
+function renderBotConfiguration() {
+  return `
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Bot Configuration</h1>
+          <p class="text-gray-600 mt-1">Set up and manage your Discord bot with custom settings</p>
+        </div>
+        <button onclick="showBotConfigModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200">
+          <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Configure Bot
+        </button>
+      </div>
+
+      <!-- Bot Status Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Bot Status</p>
+              <p class="text-2xl font-bold text-gray-900" id="botStatusText">Offline</p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <div class="w-6 h-6 bg-red-500 rounded-full" id="botStatusIndicator"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Channel</p>
+              <p class="text-2xl font-bold text-gray-900" id="botChannelText">Not Set</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Admin Roles</p>
+              <p class="text-2xl font-bold text-gray-900" id="botRolesText">0</p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration Form -->
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Bot Settings</h3>
+        <form id="botConfigForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Discord Bot Token *</label>
+              <input type="password" id="configBotToken" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Your Discord bot token" required>
+              <p class="text-xs text-gray-500 mt-1">Get this from Discord Developer Portal</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Channel ID *</label>
+              <input type="text" id="configChannelId" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="123456789012345678" required>
+              <p class="text-xs text-gray-500 mt-1">Channel for license notifications</p>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Admin Role IDs</label>
+            <input type="text" id="configAdminRoles" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="123456789012345678, 987654321098765432">
+            <p class="text-xs text-gray-500 mt-1">Comma-separated role IDs that can manage licenses</p>
+          </div>
+          
+          <div class="flex space-x-3 pt-4">
+            <button type="button" onclick="saveBotConfig()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Save Configuration
+            </button>
+            <button type="button" onclick="startBotFromConfig()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Start Bot
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Bot Commands Reference -->
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Available Commands</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-3">
+            <div class="flex items-start space-x-3">
+              <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">/license check</code>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Validate License</p>
+                <p class="text-xs text-gray-600">Check if a license key is valid</p>
+              </div>
+            </div>
+            <div class="flex items-start space-x-3">
+              <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">/license info</code>
+              <div>
+                <p class="text-sm font-medium text-gray-900">License Details</p>
+                <p class="text-xs text-gray-600">Get detailed information about a license</p>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-start space-x-3">
+              <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">/license revoke</code>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Revoke License</p>
+                <p class="text-xs text-gray-600">Revoke a license (Admin only)</p>
+              </div>
+            </div>
+            <div class="flex items-start space-x-3">
+              <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">/license stats</code>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Statistics</p>
+                <p class="text-xs text-gray-600">View license statistics</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // Global functions for modals and actions
-window.showCreateLicenseModal = async function() {
-  const plugin = prompt('Enter plugin name:');
-  const buyer = prompt('Enter buyer name:');
-  const server = prompt('Enter server name:');
-  const expiresAt = prompt('Enter expiration date (YYYY-MM-DD) or leave empty for 1 year:');
+window.showCreateLicenseModal = function() {
+  document.getElementById('createLicenseModal').classList.remove('hidden');
+  document.getElementById('createLicenseModal').classList.add('flex');
+};
+
+window.closeCreateLicenseModal = function() {
+  document.getElementById('createLicenseModal').classList.add('hidden');
+  document.getElementById('createLicenseModal').classList.remove('flex');
+  document.getElementById('createLicenseForm').reset();
+};
+
+window.createLicense = async function() {
+  const form = document.getElementById('createLicenseForm');
+  const formData = new FormData(form);
   
-  if (plugin && buyer && server) {
-    try {
-      const result = await apiRequest('/licenses/create', 'POST', {
-        plugin,
-        buyer,
-        server,
-        expiresAt: expiresAt || null
-      });
-      
-      state.licenses.unshift(result.data);
+  const plugin = formData.get('plugin');
+  const buyer = formData.get('buyer');
+  const server = formData.get('server');
+  const expiresAt = formData.get('expiresAt');
+  
+  if (!plugin || !buyer || !server) {
+    showErrorModal('Missing Information', 'Please fill in all required fields.');
+    return;
+  }
+  
+  try {
+    const result = await apiRequest('/licenses/create', 'POST', {
+      plugin,
+      buyer,
+      server,
+      expiresAt: expiresAt || null
+    });
+    
+    state.licenses.unshift(result.data);
     render();
-      alert(`License created: ${result.data.key}`);
-    } catch (error) {
-      showErrorModal('Failed to Create License', error.message);
-    }
+    closeCreateLicenseModal();
+    showSuccessModal('License Created', `License created successfully: ${result.data.key}`);
+  } catch (error) {
+    showErrorModal('Failed to Create License', error.message);
   }
 };
 
@@ -1214,8 +1562,43 @@ window.exportLicenses = function() {
 window.viewLicense = function(key) {
   const license = state.licenses.find(l => l.key === key);
   if (license) {
-    alert(`License Details:\nKey: ${license.key}\nPlugin: ${license.plugin}\nBuyer: ${license.buyer}\nServer: ${license.server}\nStatus: ${license.status}\nExpires: ${license.expiresAt}`);
+    // Populate the view license modal with license data
+    document.getElementById('viewLicenseKey').textContent = license.key;
+    document.getElementById('viewLicensePlugin').textContent = license.plugin;
+    document.getElementById('viewLicenseBuyer').textContent = license.buyer;
+    document.getElementById('viewLicenseServer').textContent = license.server;
+    document.getElementById('viewLicenseStatus').textContent = license.status;
+    document.getElementById('viewLicenseStatus').className = `px-2 py-1 rounded-full text-xs font-medium ${
+      license.status === 'active' ? 'bg-green-100 text-green-800' :
+      license.status === 'revoked' ? 'bg-red-100 text-red-800' :
+      license.status === 'expired' ? 'bg-yellow-100 text-yellow-800' :
+      'bg-gray-100 text-gray-800'
+    }`;
+    document.getElementById('viewLicenseExpires').textContent = new Date(license.expiresAt).toLocaleDateString();
+    document.getElementById('viewLicenseCreated').textContent = new Date(license.createdAt || license.purchaseDate).toLocaleDateString();
+    
+    // Show allowed servers
+    const serversList = document.getElementById('viewLicenseServers');
+    if (license.allowedServers && license.allowedServers.length > 0) {
+      serversList.innerHTML = license.allowedServers.map(server => 
+        `<div class="flex items-center justify-between bg-gray-50 p-2 rounded">
+          <span class="text-sm">${server.name || server.ip}:${server.port}</span>
+          <span class="text-xs text-gray-500">${server.ip}:${server.port}</span>
+        </div>`
+      ).join('');
+    } else {
+      serversList.innerHTML = '<div class="text-sm text-gray-500 italic">No servers configured</div>';
+    }
+    
+    // Show the modal
+    document.getElementById('viewLicenseModal').classList.remove('hidden');
+    document.getElementById('viewLicenseModal').classList.add('flex');
   }
+};
+
+window.closeViewLicenseModal = function() {
+  document.getElementById('viewLicenseModal').classList.add('hidden');
+  document.getElementById('viewLicenseModal').classList.remove('flex');
 };
 
 window.revokeLicense = async function(key) {
@@ -1442,15 +1825,149 @@ window.startDiscordBot = function() {
   const channelId = document.getElementById('channelId').value;
   const adminRoles = document.getElementById('adminRoles').value;
 
-  if (!botToken) {
-    showErrorModal('Missing Bot Token', 'Please enter your Discord bot token.');
+  if (!botToken || !channelId) {
+    showErrorModal('Missing Information', 'Please enter bot token and channel ID.');
     return;
   }
 
-  // Here you would start the Discord bot with the provided configuration
-  showSuccessModal('Discord Bot Started', 'Your Discord bot is now running with the provided configuration!');
-  closeModal('discordBotModal');
+  try {
+    // Save bot configuration to localStorage for persistence
+    const botConfig = {
+      token: botToken,
+      channelId: channelId,
+      adminRoles: adminRoles.split(',').map(role => role.trim()).filter(role => role),
+      isActive: true,
+      startedAt: new Date().toISOString()
+    };
+    localStorage.setItem('discordBotConfig', JSON.stringify(botConfig));
+    
+    // Also save to a file that the bot launcher can read
+    const configData = JSON.stringify(botConfig, null, 2);
+    const blob = new Blob([configData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bot-config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showSuccessModal('Bot Configuration Saved', 'Bot configuration saved successfully! Check your downloads folder for bot-config.json. Copy this file to the project root and run: start-bot.bat');
+    closeModal('discordBotModal');
+  } catch (error) {
+    showErrorModal('Failed to Save Configuration', error.message);
+  }
 };
+
+// Bot configuration panel functions
+window.saveBotConfig = function() {
+  const token = document.getElementById('configBotToken').value;
+  const channelId = document.getElementById('configChannelId').value;
+  const adminRoles = document.getElementById('configAdminRoles').value;
+
+  if (!token || !channelId) {
+    showErrorModal('Missing Information', 'Please enter bot token and channel ID.');
+    return;
+  }
+
+  const botConfig = {
+    token,
+    channelId,
+    adminRoles: adminRoles.split(',').map(role => role.trim()).filter(role => role)
+  };
+
+  localStorage.setItem('discordBotConfig', JSON.stringify(botConfig));
+  showSuccessModal('Configuration Saved', 'Bot configuration has been saved successfully!');
+};
+
+window.startBotFromConfig = function() {
+  const token = document.getElementById('configBotToken').value;
+  const channelId = document.getElementById('configChannelId').value;
+  const adminRoles = document.getElementById('configAdminRoles').value;
+
+  if (!token || !channelId) {
+    showErrorModal('Missing Information', 'Please enter bot token and channel ID.');
+    return;
+  }
+
+  try {
+    const botConfig = {
+      token,
+      channelId,
+      adminRoles: adminRoles.split(',').map(role => role.trim()).filter(role => role),
+      isActive: true,
+      startedAt: new Date().toISOString()
+    };
+
+    // Save configuration to localStorage
+    localStorage.setItem('discordBotConfig', JSON.stringify(botConfig));
+    
+    // Also save to a file that the bot launcher can read
+    const configData = JSON.stringify(botConfig, null, 2);
+    const blob = new Blob([configData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bot-config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showSuccessModal('Bot Configuration Saved', 'Bot configuration saved successfully! Check your downloads folder for bot-config.json. Copy this file to the project root and run: start-bot.bat');
+    
+    // Update the status indicators
+    updateBotStatus(false, channelId, botConfig.adminRoles.length);
+  } catch (error) {
+    showErrorModal('Failed to Save Configuration', error.message);
+  }
+};
+
+window.updateBotStatus = function(isRunning, channelId, roleCount) {
+  const statusText = document.getElementById('botStatusText');
+  const statusIndicator = document.getElementById('botStatusIndicator');
+  const channelText = document.getElementById('botChannelText');
+  const rolesText = document.getElementById('botRolesText');
+
+  if (statusText) {
+    statusText.textContent = isRunning ? 'Online' : 'Offline';
+  }
+  
+  if (statusIndicator) {
+    statusIndicator.className = `w-6 h-6 rounded-full ${isRunning ? 'bg-green-500' : 'bg-red-500'}`;
+  }
+  
+  if (channelText) {
+    channelText.textContent = channelId || 'Not Set';
+  }
+  
+  if (rolesText) {
+    rolesText.textContent = roleCount || '0';
+  }
+};
+
+window.loadBotConfig = function() {
+  const savedConfig = localStorage.getItem('discordBotConfig');
+  if (savedConfig) {
+    const config = JSON.parse(savedConfig);
+    document.getElementById('configBotToken').value = config.token || '';
+    document.getElementById('configChannelId').value = config.channelId || '';
+    document.getElementById('configAdminRoles').value = config.adminRoles ? config.adminRoles.join(', ') : '';
+  }
+  
+  // Load bot status from API
+  loadBotStatus();
+};
+
+window.loadBotStatus = function() {
+  try {
+    const savedConfig = localStorage.getItem('discordBotConfig');
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      updateBotStatus(false, config.channelId, config.adminRoles ? config.adminRoles.length : 0);
+    }
+  } catch (error) {
+    console.error('Failed to load bot status:', error);
+  }
+};
+
 
 // Add purchase form handler
 document.addEventListener('submit', async (e) => {
@@ -1513,3 +2030,179 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   render();
 });
+
+// Store Settings view
+function renderStoreSettings() {
+  const current = state.user?.storeSubdomain || '';
+  const domain = current ? `${current}.license.com` : 'yourname.license.com';
+  return `
+    <div class="max-w-xl mx-auto space-y-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Store Settings</h1>
+        <p class="text-gray-600 mb-4">Set your public store subdomain. This is where your plugins will be listed for others to purchase.</p>
+        <form id="subdomainForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Store Subdomain</label>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="subdomainInput" class="w-48 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="yourname" value="${current}" autocomplete="off" required pattern="^[a-z0-9-]{3,32}$">
+              <span class="text-gray-700">.license.com</span>
+            </div>
+            <p id="subdomainFeedback" class="text-xs mt-1"></p>
+          </div>
+          <div class="flex space-x-3 pt-2">
+            <button type="submit" id="saveSubdomainBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">Save Subdomain</button>
+            <button type="button" id="previewStoreBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">Preview My Store</button>
+          </div>
+        </form>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 class="font-semibold text-blue-900 mb-2">How it works:</h4>
+        <ul class="text-sm text-blue-800 space-y-1">
+          <li>• Your store will be available at <span class="font-mono">${domain}</span></li>
+          <li>• Only your plugins will be listed on your store</li>
+          <li>• You can change your subdomain at any time (old links will break)</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+// Setup event handlers for store settings
+function setupStoreSettingsEvents() {
+  const input = document.getElementById('subdomainInput');
+  const feedback = document.getElementById('subdomainFeedback');
+  const form = document.getElementById('subdomainForm');
+  const previewBtn = document.getElementById('previewStoreBtn');
+  let lastCheck = '';
+  input.oninput = async function() {
+    const val = input.value.trim().toLowerCase();
+    if (!/^[a-z0-9-]{3,32}$/.test(val)) {
+      feedback.textContent = 'Subdomain must be 3-32 chars, lowercase letters, numbers, or hyphens.';
+      feedback.className = 'text-xs text-red-600 mt-1';
+      return;
+    }
+    if (val === lastCheck) return;
+    lastCheck = val;
+    feedback.textContent = 'Checking availability...';
+    feedback.className = 'text-xs text-gray-500 mt-1';
+    try {
+      const res = await apiRequest('/user/store-subdomain', 'POST', { subdomain: val });
+      feedback.textContent = 'Available!';
+      feedback.className = 'text-xs text-green-600 mt-1';
+    } catch (e) {
+      feedback.textContent = e.message || 'Unavailable.';
+      feedback.className = 'text-xs text-red-600 mt-1';
+    }
+  };
+  form.onsubmit = async function(e) {
+    e.preventDefault();
+    const val = input.value.trim().toLowerCase();
+    if (!/^[a-z0-9-]{3,32}$/.test(val)) {
+      feedback.textContent = 'Subdomain must be 3-32 chars, lowercase letters, numbers, or hyphens.';
+      feedback.className = 'text-xs text-red-600 mt-1';
+      return;
+    }
+    try {
+      const res = await apiRequest('/user/store-subdomain', 'POST', { subdomain: val });
+      state.user.storeSubdomain = val;
+      showSuccessModal('Subdomain Saved', `Your store is now available at https://${val}.license.com`);
+      render();
+    } catch (e) {
+      feedback.textContent = e.message || 'Unavailable.';
+      feedback.className = 'text-xs text-red-600 mt-1';
+    }
+  };
+  previewBtn.onclick = function() {
+    const val = input.value.trim().toLowerCase();
+    if (/^[a-z0-9-]{3,32}$/.test(val)) {
+      window.open(`https://${val}.license.com`, '_blank');
+    } else {
+      feedback.textContent = 'Enter a valid subdomain to preview.';
+      feedback.className = 'text-xs text-red-600 mt-1';
+    }
+  };
+}
+
+// Detect if on a subdomain (public store view)
+function getSubdomain() {
+  const host = window.location.hostname;
+  if (host.endsWith('.license.com') && host.split('.').length > 2) {
+    return host.split('.')[0];
+  }
+  return null;
+}
+
+async function loadPublicStoreUser(subdomain) {
+  try {
+    // Try to fetch the user info for this subdomain
+    const res = await fetch(`${state.apiUrl}/public/user-by-subdomain/${subdomain}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function renderPublicStore() {
+  const subdomain = getSubdomain();
+  if (!subdomain) return render(); // fallback to normal app
+  // Fetch user info for this subdomain
+  const user = await loadPublicStoreUser(subdomain);
+  if (!user) {
+    document.body.innerHTML = `<div class='min-h-screen flex items-center justify-center bg-gray-50'><div class='bg-white p-8 rounded-xl shadow text-center'><h1 class='text-3xl font-bold text-red-600 mb-2'>Store Not Found</h1><p class='text-gray-600'>This store does not exist. Please check the link.</p></div></div>`;
+    return;
+  }
+  // Load plugins for this store
+  const pluginsRes = await fetch(`${state.apiUrl}/store/plugins`);
+  const pluginsData = await pluginsRes.json();
+  const plugins = pluginsData.data || [];
+  // Render public store
+  document.body.innerHTML = `
+    <div class='min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex flex-col'>
+      <header class='bg-white shadow p-6 flex items-center justify-between'>
+        <div class='flex items-center space-x-4'>
+          <img src='https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(user.email)}' class='w-12 h-12 rounded-full border-2 border-blue-200' alt='logo' />
+          <div>
+            <h1 class='text-2xl font-bold text-blue-700'>${user.name || user.storeSubdomain}'s Plugin Store</h1>
+            <p class='text-gray-500 text-sm'>${user.storeSubdomain}.license.com</p>
+          </div>
+        </div>
+        <a href='https://license.com' class='text-blue-600 hover:underline font-semibold'>Powered by Licensing SaaS</a>
+      </header>
+      <main class='flex-1 p-8'>
+        <div class='max-w-5xl mx-auto'>
+          <h2 class='text-3xl font-bold text-gray-900 mb-6'>Available Plugins</h2>
+          <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            ${plugins.length === 0 ? `<div class='col-span-3 text-center text-gray-500'>No plugins available yet.</div>` : plugins.map(plugin => `
+              <div class='bg-white rounded-xl shadow p-6 flex flex-col'>
+                <h3 class='text-lg font-semibold text-gray-900 mb-2'>${plugin.name}</h3>
+                <p class='text-gray-600 mb-4 flex-1'>${plugin.description}</p>
+                <div class='flex items-center justify-between mb-4'>
+                  <span class='text-2xl font-bold text-green-600'>$${plugin.price}</span>
+                  <span class='text-xs text-gray-500'>v${plugin.version}</span>
+                </div>
+                <button onclick="alert('Purchase flow coming soon!')" class='w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200'>Purchase License</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </main>
+      <footer class='bg-white shadow p-4 text-center text-xs text-gray-400'>
+        &copy; 2025 ${user.name || user.storeSubdomain} | Powered by Licensing SaaS
+      </footer>
+    </div>
+  `;
+}
+
+// On load, if on a subdomain, render public store
+if (getSubdomain()) {
+  renderPublicStore();
+} else {
+  // ... existing code ...
+  document.addEventListener('DOMContentLoaded', async () => {
+    // ... existing code ...
+    render();
+  });
+}
+// ... existing code ...

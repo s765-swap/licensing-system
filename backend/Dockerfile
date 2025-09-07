@@ -19,7 +19,7 @@ RUN adduser -S nodejs -u 1001
 RUN chown -R nodejs:nodejs /app
 USER nodejs
 
-# Expose port
+# Expose port (Pterodactyl will bind to this port)
 EXPOSE 4000
 
 # Health check
@@ -27,4 +27,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:4000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

@@ -44,6 +44,41 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: null
+  },
+  storeSubdomain: {
+    type: String,
+    unique: true,
+    sparse: true, // allow null for users who don't have a store
+    trim: true,
+    lowercase: true,
+    match: [/^[a-z0-9-]{3,32}$/, 'Subdomain must be 3-32 characters, lowercase letters, numbers, or hyphens']
+  },
+  stripeCustomerId: {
+    type: String,
+    default: null
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  lastActivity: {
+    type: Date,
+    default: Date.now
+  },
+  preferences: {
+    emailNotifications: {
+      type: Boolean,
+      default: true
+    },
+    discordNotifications: {
+      type: Boolean,
+      default: false
+    },
+    theme: {
+      type: String,
+      enum: ['light', 'dark', 'auto'],
+      default: 'auto'
+    }
   }
 });
 

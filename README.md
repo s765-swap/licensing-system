@@ -6,32 +6,61 @@ A complete SaaS platform for Minecraft plugin developers to manage licenses, sub
 
 ### Core Features
 - **License Management**: Generate, validate, revoke, and track license keys
-- **User Authentication**: JWT-based login/register system
-- **Plugin Management**: Create and manage your Minecraft plugins
-- **Discord Bot Integration**: Manage licenses directly from Discord
-- **Real-time Notifications**: Get notified of license events
-- **Dashboard**: Beautiful, responsive web interface
+- **User Authentication**: JWT-based login/register system with role-based access
+- **Plugin Management**: Create and manage your Minecraft plugins with categories and tags
+- **Payment Integration**: Stripe-powered payment processing with multiple license types
+- **Advanced Analytics**: Comprehensive dashboard with charts, trends, and insights
+- **Discord Bot Integration**: Manage licenses directly from Discord with slash commands
+- **Email Notifications**: Automated email alerts for license events
+- **Admin Panel**: Complete admin dashboard for user and system management
+- **API Documentation**: Interactive Swagger/OpenAPI documentation
+- **Real-time Monitoring**: Structured logging and performance tracking
 
-### License System
-- Generate unique UUID license keys
-- Store license data in MongoDB
-- Validate licenses with plugin and server information
-- Track license usage and expiration
-- Support for different license statuses (active, expired, revoked)
+### Advanced License System
+- Generate unique UUID license keys with hardware fingerprinting
+- Multi-server support with IP/port restrictions
+- License usage tracking and validation history
+- Support for different license types (1-month, 3-months, 6-months, 1-year, lifetime)
+- Automatic license expiration handling
+- License transfer and management capabilities
+
+### Payment & Subscription Features
+- Stripe Checkout integration for secure payments
+- Multiple license pricing tiers
+- Customer portal for subscription management
+- Payment history and invoice tracking
+- Automated license creation after successful payment
+- Webhook handling for payment events
+
+### Analytics & Reporting
+- Real-time dashboard with key metrics
+- License creation trends and patterns
+- Plugin performance analytics
+- User behavior tracking
+- Revenue reporting and insights
+- Data export capabilities (CSV/JSON)
+- Custom date range filtering
 
 ### Discord Bot Commands
 - `/license check <key> <plugin> <server>` - Validate a license
 - `/license info <key>` - Get detailed license information
 - `/license revoke <key>` - Revoke a license (Admin only)
 - `/license stats` - View license statistics
+- `/license create <plugin> <buyer> <server>` - Create new license (Admin only)
+- `/license list` - List all licenses (Admin only)
 
 ## 🛠 Tech Stack
 
-- **Frontend**: HTML, CSS (Tailwind), Vanilla JavaScript
+- **Frontend**: HTML, CSS (Tailwind), Vanilla JavaScript, Chart.js
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT tokens
+- **Authentication**: JWT tokens with role-based access
+- **Payment Processing**: Stripe API integration
+- **Email Service**: Nodemailer with HTML templates
+- **Logging**: Winston with structured logging
+- **API Documentation**: Swagger/OpenAPI 3.0
 - **Discord Bot**: discord.js v14
+- **Testing**: Jest with Supertest
 - **Deployment**: Docker & Docker Compose
 
 ## 📦 Project Structure
@@ -39,18 +68,23 @@ A complete SaaS platform for Minecraft plugin developers to manage licenses, sub
 ```
 /project-root
   /backend          # Express.js API server
-    /config         # Database configuration
-    /controllers    # API route handlers
-    /middleware     # Authentication middleware
-    /models         # MongoDB models
+    /config         # Database and Swagger configuration
+    /controllers    # API route handlers (auth, licenses, plugins, payments, analytics, admin)
+    /middleware     # Authentication and validation middleware
+    /models         # MongoDB models (User, License, Plugin)
     /routes         # API routes
+    /utils          # Utility functions (email, logging)
+    /tests          # Test suite
     server.js       # Main server file
-  /frontend         # React-like SPA
+  /frontend         # Vanilla JS SPA
     index.html      # Main HTML file
-    src/main.js     # Frontend application
+    src/
+      main.js       # Frontend application
+      components/   # Reusable components (Analytics, Payments)
   /bot             # Discord bot
     index.js        # Bot main file
   docker-compose.yml # Docker orchestration
+  env.example      # Environment variables template
   README.md        # This file
 ```
 
@@ -67,12 +101,12 @@ cd licensing
 ```
 
 ### 2. Environment Configuration
-Create a `.env` file in the root directory:
+Copy `env.example` to `.env` and configure your environment variables:
 ```env
-# Discord Bot Configuration
-DISCORD_BOT_TOKEN=your-discord-bot-token-here
-DISCORD_CHANNEL_ID=your-discord-channel-id-here
-ADMIN_ROLE_IDS=role-id-1,role-id-2
+# Server Configuration
+NODE_ENV=development
+PORT=4000
+FRONTEND_URL=http://localhost:3000
 
 # Database Configuration
 MONGODB_URI=mongodb://admin:password123@mongodb:27017/licensing_saas?authSource=admin
@@ -81,21 +115,58 @@ MONGODB_URI=mongodb://admin:password123@mongodb:27017/licensing_saas?authSource=
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 JWT_EXPIRE=7d
 
-# Server Configuration
-NODE_ENV=production
-PORT=4000
-FRONTEND_URL=http://localhost:3000
+# Discord Bot Configuration
+DISCORD_BOT_TOKEN=your-discord-bot-token-here
+DISCORD_CHANNEL_ID=your-discord-channel-id-here
+ADMIN_ROLE_IDS=role-id-1,role-id-2
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+
+# Email Configuration
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_FROM=noreply@licensingsaas.com
+
+# Logging Configuration
+LOG_LEVEL=info
+
+# API Configuration
+API_URL=http://localhost:4000/api
 ```
 
 ### 3. Start the Application
+
+**Option 1: Simple Mode (Recommended for Development)**
 ```bash
+# Windows
+start.bat
+
+# Linux/Mac
+./start-simple.sh
+```
+
+**Option 2: Docker Mode (Production-like)**
+```bash
+# Windows
+start-docker.bat
+
+# Linux/Mac
 docker-compose up -d
 ```
 
 ### 4. Access the Application
 - **Frontend Dashboard**: http://localhost:3000
 - **Backend API**: http://localhost:4000/api
+- **API Documentation**: http://localhost:4000/api/docs
 - **API Health Check**: http://localhost:4000/api/health
+
+### 5. Default Admin Account
+- **Email**: admin@admin.com
+- **Password**: admin
+- **Tier**: Enterprise (unlimited licenses)
 
 ## 🔧 Development Setup
 
@@ -141,6 +212,9 @@ npx serve .
 
 ## 📚 API Documentation
 
+### Interactive API Documentation
+Visit http://localhost:4000/api/docs for interactive Swagger documentation with all endpoints, request/response schemas, and testing capabilities.
+
 ### Authentication Endpoints
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
@@ -161,6 +235,26 @@ npx serve .
 - `GET /api/plugins/:id` - Get specific plugin (protected)
 - `PUT /api/plugins/:id` - Update plugin (protected)
 - `DELETE /api/plugins/:id` - Delete plugin (protected)
+
+### Payment Endpoints
+- `POST /api/payments/create-checkout-session` - Create Stripe checkout session (protected)
+- `POST /api/payments/webhook` - Handle Stripe webhooks (public)
+- `GET /api/payments/history` - Get payment history (protected)
+- `POST /api/payments/create-portal-session` - Create customer portal session (protected)
+
+### Analytics Endpoints
+- `GET /api/analytics/dashboard` - Get comprehensive analytics dashboard (protected)
+- `GET /api/analytics/license-usage` - Get license usage analytics (protected)
+- `GET /api/analytics/plugin-performance` - Get plugin performance analytics (protected)
+- `GET /api/analytics/export` - Export analytics data (protected)
+
+### Admin Endpoints (Admin only)
+- `GET /api/admin/dashboard` - Get admin dashboard statistics
+- `GET /api/admin/users` - Get all users with pagination
+- `PUT /api/admin/users/:id` - Update user
+- `DELETE /api/admin/users/:id` - Delete user
+- `GET /api/admin/licenses` - Get all licenses with admin view
+- `POST /api/admin/announcement` - Send announcement email to all users
 
 ## 🤖 Discord Bot Setup
 

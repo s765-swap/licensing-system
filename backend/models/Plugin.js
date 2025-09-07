@@ -26,6 +26,23 @@ const pluginSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  imageUrl: {
+    type: String,
+    default: ''
+  },
+  category: {
+    type: String,
+    enum: ['utility', 'economy', 'pvp', 'rpg', 'minigame', 'admin', 'other'],
+    default: 'utility'
+  },
+  tags: [{
+    type: String,
+    trim: true
+  }],
+  isPublic: {
+    type: Boolean,
+    default: false
+  },
   isActive: {
     type: Boolean,
     default: true
